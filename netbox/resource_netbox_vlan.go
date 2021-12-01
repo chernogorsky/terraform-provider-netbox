@@ -45,7 +45,7 @@ func resourceNetboxVlan() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"vlan_group_id": {
+			"R": {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},

@@ -25,6 +25,11 @@ resource "netbox_site" "test" {
   name = "%[1]s"
   status = "active"
 }
+
+resource "netbox_vlan_group" "test" {
+  name = "%[1]s"
+  slug = "%[1]s"
+}
 `, testName)
 }
 func TestAccNetboxVlan_basic(t *testing.T) {
@@ -81,6 +86,7 @@ resource "netbox_vlan" "test_with_dependencies" {
   status = "active"
   tenant_id = netbox_tenant.test.id
   site_id = netbox_site.test.id
+  vlan_group_id = netbox_vlan_group.test.id
   tags = [netbox_tag.test.name]
 }`, testName, testVid, testDescription),
 				Check: resource.ComposeTestCheckFunc(
@@ -90,6 +96,7 @@ resource "netbox_vlan" "test_with_dependencies" {
 					resource.TestCheckResourceAttr("netbox_vlan.test_with_dependencies", "status", "active"),
 					resource.TestCheckResourceAttrPair("netbox_vlan.test_with_dependencies", "tenant_id", "netbox_tenant.test", "id"),
 					resource.TestCheckResourceAttrPair("netbox_vlan.test_with_dependencies", "site_id", "netbox_site.test", "id"),
+					resource.TestCheckResourceAttrPair("netbox_vlan.test_with_dependencies", "vlan_group_id", "netbox_vlan_group.test", "id"),
 					resource.TestCheckResourceAttr("netbox_vlan.test_with_dependencies", "tags.#", "1"),
 					resource.TestCheckResourceAttr("netbox_vlan.test_with_dependencies", "tags.0", testName),
 				),
