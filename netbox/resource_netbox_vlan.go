@@ -45,6 +45,10 @@ func resourceNetboxVlan() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
+			"vlan_group_id": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 			"description": &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
@@ -70,6 +74,7 @@ func resourceNetboxVlanCreate(d *schema.ResourceData, m interface{}) error {
 
 	name := d.Get("name").(string)
 	vid := int64(d.Get("vid").(int))
+	vgid := int64(d.Get("vlan_group_id").(int))
 	status := d.Get("status").(string)
 	description := d.Get("description").(string)
 
@@ -77,6 +82,7 @@ func resourceNetboxVlanCreate(d *schema.ResourceData, m interface{}) error {
 	data.Vid = &vid
 	data.Status = status
 	data.Description = description
+	data.Group = &vgid
 
 	data.Tags, _ = getNestedTagListFromResourceDataSet(api, d.Get("tags"))
 
@@ -114,6 +120,11 @@ func resourceNetboxVlanRead(d *schema.ResourceData, m interface{}) error {
 		d.Set("vid", res.GetPayload().Vid)
 	}
 
+	if res.GetPayload().Group != nil {
+		d.Set("vlan_group_id", res.GetPayload().Group)
+	}
+
+
 	if res.GetPayload().Status != nil {
 		d.Set("status", res.GetPayload().Status.Value)
 	}
@@ -145,11 +156,13 @@ func resourceNetboxVlanUpdate(d *schema.ResourceData, m interface{}) error {
 	data := models.WritableVLAN{}
 	name := d.Get("name").(string)
 	vid := int64(d.Get("vid").(int))
+	vgid := int64(d.Get("vlan_group_id").(int))
 	status := d.Get("status").(string)
 	description := d.Get("description").(string)
 
 	data.Name = &name
 	data.Vid = &vid
+	data.Group = &vgid	
 
 	data.Status = status
 	data.Description = description
